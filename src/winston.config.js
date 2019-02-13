@@ -257,7 +257,7 @@ module.exports = function () {
                     let body = {}
                     Object.assign(body, req.body)
                     if (body.password)
-                        body.password = undefined
+                        delete body.password
 
                     let metaData = {
                         user: user,
