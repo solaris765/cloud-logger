@@ -1,3 +1,10 @@
+const winston = require(`winston`),
+    { LoggingWinston: GCloud } = require(`@google-cloud/logging-winston`),
+    colors = require(`colors`),
+    genStack = require(`./modules/retro-gen-stack`)
+
+require(`winston-mongodb`)
+
 const LOG_LEVEL_NAME = process.env.LOGGING || `info`,
     LOG_LEVELS = {
         error: `error`,
@@ -7,29 +14,10 @@ const LOG_LEVEL_NAME = process.env.LOGGING || `info`,
         debug: `debug`,
         silly: `silly`
     },
-    winston = require(`winston`),
     { createLogger, format, transports } = winston,
     { combine, timestamp, label, printf } = format,
-    colors = require(`colors`),
-    { LoggingWinston: GCloud } = require(`@google-cloud/logging-winston`),
-    gcloud = new GCloud({
-        logName: `winston_log`,
-        resource: {
-            type: `gae_app`,
-            labels: {
-                module_id: process.env.GAE_SERVICE
-                    ? process.env.GAE_SERVICE
-                    : `local-development`,
-                version_id: process.env.GAE_VERSION
-                    ? process.env.GAE_VERSION
-                    : `local-dev-${require(`git-user-name`)()}`
-            }
-        }
-    }),
     http_transports = [],
     log_transports = []
-
-require(`winston-mongodb`)
 
 let check_log_level_name = level => {
     if (!LOG_LEVELS[level]) {
@@ -70,9 +58,9 @@ const http_format = printf(info => {
     return `${info.level}: ${colors.cyan(
         info.httpRequest.requestMethod
     )} ${status} ${humanFileSize(info.httpRequest.responseSize, true) ||
-        0} ${info.httpRequest.latency.nanos / 1e6} ms ${
+    0} ${info.httpRequest.latency.nanos / 1e6} ms ${
         info.httpRequest.requestUrl
-    } ${info.jsonMessage ? `(${info.jsonMessage})` : ``}`
+        } ${info.jsonMessage ? `(${info.jsonMessage})` : ``}`
 })
 
 const http_format_mongo = format(info => {
@@ -93,6 +81,21 @@ if (
     process.env.NODE_ENV === `production` ||
     process.env.NODE_ENV === `gusadev`
 ) {
+    gcloud = new GCloud({
+        logName: `winston_log`,
+        resource: {
+            type: `gae_app`,
+            labels: {
+                module_id: process.env.GAE_SERVICE
+                    ? process.env.GAE_SERVICE
+                    : `local-development`,
+                version_id: process.env.GAE_VERSION
+                    ? process.env.GAE_VERSION
+                    : `local-dev-${require(`git-user-name`)()}`
+            }
+        }
+    })
+    
     log_transports.push(gcloud)
     http_transports.push(gcloud)
 } else {
@@ -127,7 +130,7 @@ let logger = createLogger({
  * Initializes the mongo db Transport
  * @param {*} db A MongoDB Database
  */
-logger.initMongoTransport = function(db) {
+logger.initMongoTransport = function (db) {
     logger.add(
         new transports.MongoDB({
             db: db,
@@ -154,11 +157,8 @@ logger.verbose(`enabled`)
 logger.debug(`enabled`)
 logger.silly(`enabled`)
 
-// tmp override error log test
-genStack = require(`./modules/retro-gen-stack`)
-
 Log.err_bak = Log.error
-Log.error = function(err, ...args) {
+Log.error = function (err, ...args) {
     if (err !== Object(err)) {
         err = genStack(err)
     } else if (!err.stack) {
@@ -187,7 +187,7 @@ function parseJwt(token) {
 }
 
 // Express middleware
-logger.express = function(req, res, next) {
+logger.express = function (req, res, next) {
     let filter = [`/api/liveness_check`, `/api/readiness_check`].includes(
         req.originalUrl
     )
@@ -195,7 +195,7 @@ logger.express = function(req, res, next) {
     let oldSend = res.send,
         message
 
-    res.send = function(data) {
+    res.send = function (data) {
         try {
             message = JSON.parse(arguments[0]).message
         } catch (err) {
@@ -205,7 +205,7 @@ logger.express = function(req, res, next) {
     }
 
     const start = process.hrtime()
-    res.on(`finish`, function() {
+    res.on(`finish`, function () {
         if (!(filter && !(req.baseUrl + req.url !== req.originalUrl))) {
             new Promise(() => {
                 let statusCode =
