@@ -132,7 +132,7 @@ module.exports = function () {
      */
     if (process.env.LOG_MONGO) {
         try {
-            let con = mongo.connect(process.env.LOG_MONGO, { autoReconnect: true, useNewUrlParser: true })
+            let con = await mongo.connect(process.env.LOG_MONGO, { autoReconnect: true, useNewUrlParser: true })
 
             logger.add(
                 new MongoDB({
@@ -251,10 +251,15 @@ module.exports = function () {
                         duration.nanos += 1000000000
                     }
 
+                    let body = {}
+                    Object.assign(body, req.body)
+                    if (body.password)
+                        body.password = undefined
+
                     let metaData = {
                         user: user,
                         jsonMessage: message,
-                        requestBody: req.body || null,
+                        requestBody: body || null,
                         httpRequest: {
                             requestMethod: req.method,
                             requestUrl: req.originalUrl,
@@ -265,7 +270,7 @@ module.exports = function () {
                             requestSize: req.socket.bytesRead,
                             responseSize: req.socket.bytesWritten,
                             requestBody:
-                                req.method === `POST` ? req.body : undefined
+                                req.method === `POST` ? body : undefined
                         }
                     }
 
