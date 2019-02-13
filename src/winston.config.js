@@ -130,29 +130,32 @@ module.exports = function () {
     /**
      * Initializes the mongo db Transport
      */
-    if (process.env.LOG_MONGO) {
-        try {
-            let con = await mongo.connect(process.env.LOG_MONGO, { autoReconnect: true, useNewUrlParser: true })
+    async function init_mongo() {
+        if (process.env.LOG_MONGO) {
+            try {
+                let con = await mongo.connect(process.env.LOG_MONGO, { autoReconnect: true, useNewUrlParser: true })
 
-            logger.add(
-                new MongoDB({
-                    db: con,
-                    level: log_level,
-                    label: process.env.GAE_SERVICE || undefined
-                })
-            )
-            http_logger.add(
-                new MongoDB({
-                    db: con,
-                    level: log_level,
-                    label: process.env.GAE_SERVICE || undefined,
-                    format: http_format_mongo()
-                })
-            )
-        } catch (err) {
-            Log.err(err)
+                logger.add(
+                    new MongoDB({
+                        db: con,
+                        level: log_level,
+                        label: process.env.GAE_SERVICE || undefined
+                    })
+                )
+                http_logger.add(
+                    new MongoDB({
+                        db: con,
+                        level: log_level,
+                        label: process.env.GAE_SERVICE || undefined,
+                        format: http_format_mongo()
+                    })
+                )
+            } catch (err) {
+                Log.err(err)
+            }
         }
     }
+    init_mongo()
 
     global.Log = logger
 
