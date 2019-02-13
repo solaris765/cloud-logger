@@ -95,7 +95,7 @@ if (
             }
         }
     })
-    
+
     log_transports.push(gcloud)
     http_transports.push(gcloud)
 } else {
@@ -128,19 +128,18 @@ let logger = createLogger({
 
 /**
  * Initializes the mongo db Transport
- * @param {*} db A MongoDB Database
  */
-logger.initMongoTransport = function (db) {
+if (process.env.LOG_MONGO) {
     logger.add(
         new transports.MongoDB({
-            db: db,
+            db: process.env.LOG_MONGO,
             level: log_level,
             label: process.env.GAE_SERVICE || undefined
         })
     )
     http_logger.add(
         new transports.MongoDB({
-            db: db,
+            db: process.env.LOG_MONGO,
             level: log_level,
             label: process.env.GAE_SERVICE || undefined,
             format: http_format_mongo()
@@ -150,12 +149,12 @@ logger.initMongoTransport = function (db) {
 
 global.Log = logger
 
-logger.error(`enabled`)
-logger.warn(`enabled`)
-logger.info(`enabled`)
-logger.verbose(`enabled`)
-logger.debug(`enabled`)
-logger.silly(`enabled`)
+// logger.error(`enabled`)
+// logger.warn(`enabled`)
+// logger.info(`enabled`)
+// logger.verbose(`enabled`)
+// logger.debug(`enabled`)
+// logger.silly(`enabled`)
 
 Log.err_bak = Log.error
 Log.error = function (err, ...args) {
