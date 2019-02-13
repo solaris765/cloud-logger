@@ -1,10 +1,10 @@
 module.exports = function () {
     const winston = require(`winston`),
         { LoggingWinston: GCloud } = require(`@google-cloud/logging-winston`),
+        { MongoDB } = require(`winston-mongodb`),
+        mongo = require(`mongodb`),
         colors = require(`colors`),
         genStack = require(`./modules/retro-gen-stack`)
-
-    require(`winston-mongodb`)
 
     const LOG_LEVEL_NAME = process.env.LOGGING || `info`,
         LOG_LEVELS = {
@@ -16,7 +16,7 @@ module.exports = function () {
             silly: `silly`
         },
         { createLogger, format, transports } = winston,
-        { combine, timestamp, label, printf } = format,
+        { combine, printf } = format,
         http_transports = [],
         log_transports = []
 
@@ -131,21 +131,27 @@ module.exports = function () {
      * Initializes the mongo db Transport
      */
     if (process.env.LOG_MONGO) {
-        logger.add(
-            new transports.MongoDB({
-                db: process.env.LOG_MONGO,
-                level: log_level,
-                label: process.env.GAE_SERVICE || undefined
-            })
-        )
-        http_logger.add(
-            new transports.MongoDB({
-                db: process.env.LOG_MONGO,
-                level: log_level,
-                label: process.env.GAE_SERVICE || undefined,
-                format: http_format_mongo()
-            })
-        )
+        try {
+            let con = mongo.connect(process.env.LOG_MONGO, { autoReconnect: true, useNewUrlParser: true })
+
+            logger.add(
+                new MongoDB({
+                    db: con,
+                    level: log_level,
+                    label: process.env.GAE_SERVICE || undefined
+                })
+            )
+            http_logger.add(
+                new MongoDB({
+                    db: con,
+                    level: log_level,
+                    label: process.env.GAE_SERVICE || undefined,
+                    format: http_format_mongo()
+                })
+            )
+        } catch (err) {
+            Log.err(err)
+        }
     }
 
     global.Log = logger
