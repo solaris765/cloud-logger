@@ -270,14 +270,11 @@ module.exports = function () {
                         }
                     }
 
-                    if (req.originalUrl === `/api/loginvue`)
+                    if (req.originalUrl === `/api/auth/login`)
                         metaData[`login_attempt_user`] = req.body.email
                     http_logger.log(
                         level,
-                        `${req.method} ${statusCode} ${humanFileSize(
-                            res._contentLength,
-                            true
-                        ) || 0} ${end} ms ${req.originalUrl} `,
+                        `${req.method} ${statusCode} ${humanFileSize(res._contentLength, true) || 0} ${end} ms ${req.originalUrl} `,
                         metaData
                     )
                 })

@@ -1,5 +1,5 @@
 {
-  "name": "gusa-logging",
+  "name": "cloud-logger",
   "version": "1.0.2",
   "description": "Winston -> MongoDB + gcloud logging module.",
   "main": "./src/winston.config.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rugged-service/gusa-logging.git"
+    "url": "git+origin https://github.com/solaris765/cloud-logger.git"
   },
   "author": "Mason Rhodes",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/rugged-service/gusa-logging/issues"
+    "url": "https://github.com/solaris765/cloud-logger/issues"
   },
-  "homepage": "https://github.com/rugged-service/gusa-logging#readme",
+  "homepage": "https://github.com/solaris765/cloud-logger#readme",
   "dependencies": {
     "@google-cloud/logging-winston": "^0.10.2",
     "callsite": "^1.0.0",
