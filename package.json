@@ -1,6 +1,6 @@
 {
   "name": "gusa-logging",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Winston -> MongoDB + gcloud logging module.",
   "main": "./src/winston.config.js",
   "scripts": {
