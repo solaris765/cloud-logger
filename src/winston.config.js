@@ -127,6 +127,8 @@ module.exports = function () {
         transports: log_transports
     })
 
+    global.Log = logger
+
     /**
      * Initializes the mongo db Transport
      */
@@ -151,20 +153,11 @@ module.exports = function () {
                     })
                 )
             } catch (err) {
-                Log.err(err)
+                Log.error(err)
             }
         }
     }
     init_mongo()
-
-    global.Log = logger
-
-    // logger.error(`enabled`)
-    // logger.warn(`enabled`)
-    // logger.info(`enabled`)
-    // logger.verbose(`enabled`)
-    // logger.debug(`enabled`)
-    // logger.silly(`enabled`)
 
     Log.err_bak = Log.error
     Log.error = function (err, ...args) {
