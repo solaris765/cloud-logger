@@ -1,11 +1,10 @@
 class makeWinston {
     constructor() {
         if (process.env.NODE_ENV === 'development') {
-            let check = global.CLOUD_LOGGER_SINGLETON_CHECK
-            if (check) check++
-            else check = 1
+            if (global.CLOUD_LOGGER_SINGLETON_CHECK) global.CLOUD_LOGGER_SINGLETON_CHECK++
+            else global.CLOUD_LOGGER_SINGLETON_CHECK = 1
     
-            if (check > 1) Log.error(`Module 'cloud_logger' has ${check} instances.`)
+            if (global.CLOUD_LOGGER_SINGLETON_CHECK > 1) Log.error(`Module 'cloud_logger' has ${global.CLOUD_LOGGER_SINGLETON_CHECK} instances.`)
         }
     
         const winston = require(`winston`),
