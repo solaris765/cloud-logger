@@ -1,4 +1,12 @@
 module.exports = function () {
+    if (process.env.NODE_ENV === 'development') {
+        let check = global.CLOUD_LOGGER_SINGLETON_CHECK
+        if (check) check++
+        else check = 1
+
+        if (check > 1) Log.error(`Module 'cloud_logger' has ${check} instances.`)
+    }
+
     const winston = require(`winston`),
         { LoggingWinston: GCloud } = require(`@google-cloud/logging-winston`),
         { MongoDB } = require(`winston-mongodb`),
